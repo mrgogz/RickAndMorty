@@ -40,10 +40,13 @@ class CharacterDetailViewController: UIViewController {
         configureSpecy()
         configureSpecyLabel()
         configureOrigin()
+        configureOriginLabel()
         configureLocation()
+        configureLocationLabel()
         configureEpisodes()
+        configureEpisodesLabel()
         configureStatus()
-        
+        configureStatusLabel()
     }
     
     func configureBackButton() {
@@ -122,7 +125,7 @@ class CharacterDetailViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             specyLabel.topAnchor.constraint(equalTo: genderLabel.bottomAnchor, constant: 10),
-            specyLabel.leadingAnchor.constraint(equalTo: specy.trailingAnchor, constant: 45)
+            specyLabel.leadingAnchor.constraint(equalTo: genderLabel.leadingAnchor)
         ])
     }
     
@@ -140,6 +143,17 @@ class CharacterDetailViewController: UIViewController {
         ])
     }
     
+    func configureOriginLabel() {
+        view.addSubview(originLabel)
+        originLabel.translatesAutoresizingMaskIntoConstraints = false
+        originLabel.font = .systemFont(ofSize: 20, weight: .regular)
+        
+        NSLayoutConstraint.activate([
+            originLabel.topAnchor.constraint(equalTo: specyLabel.bottomAnchor, constant: 10),
+            originLabel.leadingAnchor.constraint(equalTo: specyLabel.leadingAnchor)
+        ])
+    }
+    
     func configureLocation() {
         view.addSubview(location)
         
@@ -151,6 +165,17 @@ class CharacterDetailViewController: UIViewController {
         NSLayoutConstraint.activate([
             location.topAnchor.constraint(equalTo: origin.bottomAnchor, constant: 10),
             location.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25)
+        ])
+    }
+    
+    func configureLocationLabel() {
+        view.addSubview(locationLabel)
+        locationLabel.translatesAutoresizingMaskIntoConstraints = false
+        locationLabel.font = .systemFont(ofSize: 20, weight: .regular)
+        
+        NSLayoutConstraint.activate([
+            locationLabel.topAnchor.constraint(equalTo: originLabel.bottomAnchor, constant: 10),
+            locationLabel.leadingAnchor.constraint(equalTo: originLabel.leadingAnchor)
         ])
     }
     
@@ -168,6 +193,17 @@ class CharacterDetailViewController: UIViewController {
         ])
     }
     
+    func configureEpisodesLabel() {
+        view.addSubview(episodesLabel)
+        episodesLabel.translatesAutoresizingMaskIntoConstraints = false
+        episodesLabel.font = .systemFont(ofSize: 20, weight: .regular)
+        
+        NSLayoutConstraint.activate([
+            episodesLabel.topAnchor.constraint(equalTo: locationLabel.bottomAnchor, constant: 10),
+            episodesLabel.leadingAnchor.constraint(equalTo: locationLabel.leadingAnchor)
+        ])
+    }
+    
     func configureStatus() {
         view.addSubview(status)
         
@@ -179,6 +215,17 @@ class CharacterDetailViewController: UIViewController {
         NSLayoutConstraint.activate([
             status.topAnchor.constraint(equalTo: episodes.bottomAnchor, constant: 10),
             status.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 25)
+        ])
+    }
+    
+    func configureStatusLabel() {
+        view.addSubview(statusLabel)
+        statusLabel.translatesAutoresizingMaskIntoConstraints = false
+        statusLabel.font = .systemFont(ofSize: 20, weight: .regular)
+        
+        NSLayoutConstraint.activate([
+            statusLabel.topAnchor.constraint(equalTo: episodesLabel.bottomAnchor, constant: 10),
+            statusLabel.leadingAnchor.constraint(equalTo: episodesLabel.leadingAnchor)
         ])
     }
     
