@@ -11,7 +11,7 @@ class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let vc2 = UINavigationController(rootViewController: FavoriteVC())
+        let vc2 = UINavigationController(rootViewController: DetailVC())
         let vc1 = UINavigationController(rootViewController: HomeVC())
         
         vc2.tabBarItem.image = UIImage(systemName: "heart.fill")
@@ -21,7 +21,7 @@ class TabBarController: UITabBarController {
         vc1.title = "Home"
         
         setViewControllers([vc1, vc2], animated: true)
-        tabBar.tintColor = .black
-        
+        tabBar.tintColor = .systemGreen
+        UINavigationBar.appearance().tintColor = .systemGreen
     }
 }

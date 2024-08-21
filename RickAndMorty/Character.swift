@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Character: Decodable {
+struct Character: Codable, Equatable {
     let name, status, species: String
     let gender: String
     let origin, location: CharacterLocation
@@ -17,16 +17,16 @@ struct Character: Decodable {
 }
 
 // MARK: - Location
-struct CharacterLocation: Decodable {
+struct CharacterLocation: Codable, Equatable{
     let name: String
 }
 
-struct APIResult: Decodable {
+struct APIResult: Codable, Equatable {
     let results: [Character]
     let info: Info
 }
 
-struct Info: Decodable {
+struct Info: Codable, Equatable {
     let count: Int
     let pages: Int
 }
