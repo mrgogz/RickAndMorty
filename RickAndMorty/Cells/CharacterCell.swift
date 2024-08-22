@@ -23,7 +23,7 @@ class CharacterCell: UICollectionViewCell {
     }
     
     func set(character: Character) {
-        avatarImageView.downloadImage(fromURL: character.image ?? "")
+        avatarImageView.downloadImage(fromURL: character.image)
         characterNameLabel.text = character.name
     }
     

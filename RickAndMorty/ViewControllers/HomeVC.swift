@@ -9,8 +9,11 @@ import UIKit
 
 class HomeVC: UIViewController {
     
+    var page = 1
+    var hasMoreCharacter = true
     var characters: [Character] = []
     var collectionView: UICollectionView!
+    var isLoadingMoreCharacters = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +53,10 @@ class HomeVC: UIViewController {
             print(error)
         }
     }
+    
+    func updateUI(with characters: [Character]) {
+        if characters.count < 20 { self.hasMoreCharacter = false }
+    }
 }
 
 extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -76,5 +83,17 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         let itemWidth = availableWidth / 2
         
         return CGSize(width: itemWidth, height: itemWidth + 25)
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) async {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+        
+        if offsetY > contentHeight - height {
+            guard hasMoreCharacter, !isLoadingMoreCharacters else { return }
+            page += 1
+            await getCharacters(page: page)
+        }
     }
 }

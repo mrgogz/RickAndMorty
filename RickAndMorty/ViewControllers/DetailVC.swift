@@ -19,44 +19,15 @@ class DetailVC: UIViewController {
     var status = TitleLabel(textAlignment: .left, fontSize: 15)
     var gender = TitleLabel(textAlignment: .left, fontSize: 15)
     var location = TitleLabel(textAlignment: .left, fontSize: 15)
+    var colorView = UIView()
     
     private var character: Character!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(favoriteButtonTapped))
-    }
-    
-    @objc func favoriteButtonTapped() {
-        let currentImage = navigationItem.rightBarButtonItem?.image
-        let newImage = currentImage == UIImage(systemName: "heart") ?
-        UIImage(systemName: "heart.fill") : UIImage(systemName: "heart")
-        
-        navigationItem.rightBarButtonItem?.image = newImage
-        
-        var favorite = PersistentManager.shared.readData()
-        if favorite.contains(where: { character in
-            self.character == character
-        }) {
-            remove()
-        } else {
-            add()
-        }
-    }
-    
-    func remove() {
-        var favorite = PersistentManager.shared.readData()
-        favorite.removeAll() { character in
-            self.character == character
-        }
-        PersistentManager.shared.saveData(data: favorite)
-    }
-    
-    func add() {
-        var favorite = PersistentManager.shared.readData()
-        favorite.append(character)
-        PersistentManager.shared.saveData(data: favorite)
+        checkData()
+        configureColorView()
     }
     
     func set(character: Character) {
@@ -68,13 +39,48 @@ class DetailVC: UIViewController {
         title = character.name
     }
     
-    func configureUI() {
-        view.backgroundColor = .systemBackground
-        var itemViews = [name, status, gender, location, avatarImageView, characterNameLabel, statusLabel, genderLabel, locationLabel]
-        var forLeftBounds = [name, status, gender, location]
-        var forRightBounds = [characterNameLabel, statusLabel, genderLabel, locationLabel]
+    private func checkData() {
+        let favoriteCharacter = PersistentManager.shared.readData()
+        if favoriteCharacter.contains (where: { $0 == character })  {
+            configureRemoveFavoritesButton()
+        }
+        else {
+            configureAddFavoritesButton()
+        }
+    }
+    
+    private func configureAddFavoritesButton() {
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(addFavorite))
+    }
+    
+    private func configureRemoveFavoritesButton() {
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "heart.fill"), style: .plain, target: self, action: #selector(removeFavorite))
+    }
+    
+    @objc private func addFavorite() {
+        guard let character = character else { return }
         
-        //???
+        var favoriteCharacter = PersistentManager.shared.readData()
+        favoriteCharacter.append(character)
+        PersistentManager.shared.saveData(data: favoriteCharacter)
+        configureRemoveFavoritesButton()
+    }
+    
+    @objc private func removeFavorite() {
+        guard let character = character else { return }
+        
+        var favoriteCharacter = PersistentManager.shared.readData()
+        favoriteCharacter.removeAll { $0 == character }
+        PersistentManager.shared.saveData(data: favoriteCharacter)
+        configureAddFavoritesButton()
+    }
+    
+    private func configureUI() {
+        view.backgroundColor = .systemBackground
+        let itemViews = [name, status, gender, location, avatarImageView, characterNameLabel, statusLabel, genderLabel, locationLabel]
+        let forLeftBounds = [name, status, gender, location]
+        let forRightBounds = [characterNameLabel, statusLabel, genderLabel, locationLabel]
+        
         for itemView in itemViews {
             view.addSubview(itemView)
             itemView.translatesAutoresizingMaskIntoConstraints = false
@@ -97,7 +103,6 @@ class DetailVC: UIViewController {
         gender.text = "Gender:"
         location.text = "Location:"
         
-        
         NSLayoutConstraint.activate([
             avatarImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
             avatarImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -116,4 +121,26 @@ class DetailVC: UIViewController {
         ])
     }
     
+    private func configureColorView() {
+        view.addSubview(colorView)
+        colorView.translatesAutoresizingMaskIntoConstraints = false
+        colorView.layer.cornerRadius = 8
+        
+        NSLayoutConstraint.activate([
+            colorView.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 22),
+            colorView.leadingAnchor.constraint(equalTo: genderLabel.trailingAnchor),
+            colorView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -165),
+            colorView.widthAnchor.constraint(equalToConstant: 14),
+            colorView.heightAnchor.constraint(equalToConstant: 14)
+        ])
+        
+        switch genderLabel.text {
+        case "Male":
+            colorView.backgroundColor = .systemBlue
+        case "Female":
+            colorView.backgroundColor = .systemPink
+        default:
+            colorView.backgroundColor = .black
+        }
+    }
 }
