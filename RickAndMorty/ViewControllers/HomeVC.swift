@@ -12,17 +12,31 @@ class HomeVC: UIViewController {
     var page = 1
     var hasMoreCharacter = true
     var characters: [Character] = []
+    var filteredCharacters: [Character] = []
     var collectionView: UICollectionView!
     var isLoadingMoreCharacters = false
+    var searchController: UISearchController!
+    var isSearching = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Rick and Morty"
+        configureSearchController()
         configureCollectionView()
         Task { await getCharacters(page: 1)
             collectionView.reloadData()
         }
+    }
+    
+    func configureSearchController() {
+        searchController = UISearchController(searchResultsController: nil)
+        searchController.searchResultsUpdater = self
+        searchController.searchBar.placeholder = "Search for a character"
+        searchController.obscuresBackgroundDuringPresentation = false
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        definesPresentationContext = true
     }
     
     func configureCollectionView() {
@@ -48,30 +62,30 @@ class HomeVC: UIViewController {
     
     func getCharacters(page: Int) async {
         do {
-            characters = try await NetworkManager.shared.getCharacters(page: page)
+            let characters = try await NetworkManager.shared.getCharacters(page: page)
+            self.characters.append(contentsOf: characters)
+            collectionView.reloadData()
         } catch {
             print(error)
         }
-    }
-    
-    func updateUI(with characters: [Character]) {
-        if characters.count < 20 { self.hasMoreCharacter = false }
     }
 }
 
 extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        characters.count
+        isSearching ? filteredCharacters.count : characters.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CharacterCell.reuseID, for: indexPath) as! CharacterCell
-        cell.set(character: characters[indexPath.row])
+        let activeArray = isSearching ? filteredCharacters : characters
+        cell.set(character: activeArray[indexPath.row])
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedCharacter = characters[indexPath.row]
+        let activeArray = isSearching ? filteredCharacters : characters
+        let selectedCharacter = activeArray[indexPath.row]
         let vc = DetailVC()
         vc.set(character: selectedCharacter)
         navigationController?.pushViewController(vc, animated: true)
@@ -85,7 +99,7 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         return CGSize(width: itemWidth, height: itemWidth + 25)
     }
     
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) async {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let height = scrollView.frame.size.height
@@ -93,7 +107,23 @@ extension HomeVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollec
         if offsetY > contentHeight - height {
             guard hasMoreCharacter, !isLoadingMoreCharacters else { return }
             page += 1
-            await getCharacters(page: page)
+            Task { await getCharacters(page: page) }
         }
+    }
+}
+
+extension HomeVC: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let filter = searchController.searchBar.text, !filter.isEmpty else {
+            filteredCharacters = characters
+            collectionView.reloadData()
+            isSearching = false
+            return
+        }
+        isSearching = true
+        filteredCharacters = characters.filter { character in
+            character.name.lowercased().contains(filter.lowercased())
+        }
+        collectionView.reloadData()
     }
 }

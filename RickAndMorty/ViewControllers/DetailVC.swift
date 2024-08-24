@@ -31,6 +31,7 @@ class DetailVC: UIViewController {
     }
     
     func set(character: Character) {
+        self.character = character
         avatarImageView.downloadImage(fromURL: character.image)
         characterNameLabel.text = character.name
         statusLabel.text = character.status
@@ -77,22 +78,21 @@ class DetailVC: UIViewController {
     
     private func configureUI() {
         view.backgroundColor = .systemBackground
-        let itemViews = [name, status, gender, location, avatarImageView, characterNameLabel, statusLabel, genderLabel, locationLabel]
         let forLeftBounds = [name, status, gender, location]
         let forRightBounds = [characterNameLabel, statusLabel, genderLabel, locationLabel]
         
-        for itemView in itemViews {
-            view.addSubview(itemView)
-            itemView.translatesAutoresizingMaskIntoConstraints = false
-        }
-        
+        view.addSubview(avatarImageView)
+
         for leftBounds in forLeftBounds {
+            view.addSubview(leftBounds)
+            leftBounds.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
                 leftBounds.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 35)
             ])
         }
         
         for rightBounds in forRightBounds {
+            view.addSubview(rightBounds)
             NSLayoutConstraint.activate([
                 rightBounds.leadingAnchor.constraint(equalTo: view.trailingAnchor, constant: -250)
             ])
@@ -127,9 +127,8 @@ class DetailVC: UIViewController {
         colorView.layer.cornerRadius = 8
         
         NSLayoutConstraint.activate([
-            colorView.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 22),
-            colorView.leadingAnchor.constraint(equalTo: genderLabel.trailingAnchor),
-            colorView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -165),
+            colorView.centerYAnchor.constraint(equalTo: genderLabel.centerYAnchor),
+            colorView.leadingAnchor.constraint(equalTo: genderLabel.trailingAnchor, constant: 10),
             colorView.widthAnchor.constraint(equalToConstant: 14),
             colorView.heightAnchor.constraint(equalToConstant: 14)
         ])

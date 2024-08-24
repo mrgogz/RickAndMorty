@@ -34,7 +34,7 @@ class FavoriteVC: UIViewController {
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CharacterCell")
+        tableView.register(FavoriteCell.self, forCellReuseIdentifier: FavoriteCell.reuseID)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.rowHeight = 80
